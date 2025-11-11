@@ -1,6 +1,7 @@
 public class Hashmap {
     // Prime number
-    public final int DEFAULT_TABLE_SIZE = 1009;
+    public final int DEFAULT_TABLE_SIZE = 1999;
+    public final double ALPHA = 0.4;
 
     public final int RADIX = 256;
 
@@ -35,34 +36,32 @@ public class Hashmap {
     // Adds a new key and value to the hashmap
     public void add(String key, String value) {
         // Add value at its index (its hash) and check for collisions
-
+        num_elements++;
         // Check to resize
-        int index = hash(key);
 
-        if (num_elements >= tableSize / 2) {
+        if (num_elements >= tableSize * ALPHA) {
             resize();
         }
+        int index = hash(key);
 
         while (keys[index] != null) {
             // Don't want to overflow
-            if (index >= tableSize / 2)
+            index++;
+            if (index == tableSize)
                 index = 0;
-            else
-                index++;
         }
         keys[index] = key;
         values[index] = value;
-        num_elements++;
+
     }
 
     // Returns the value stored at key in the hashmap
     public String get(String key) {
         int index = hash(key);
         while (keys[index] != null && !keys[index].equals(key)) {
-            if (index >= tableSize / 2)
+            index++;
+            if (index == tableSize)
                 index = 0;
-            else
-                index++;
         }
         return values[index];
     }

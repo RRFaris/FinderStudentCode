@@ -23,9 +23,11 @@ public class Hashmap {
     }
 
     // Horner's method
-    public int hash(String key, int m) {
+    public int hash(String key) {
         int hash = 0;
-        for (int i = 0; i < m; i++)
+        int length = key.length();
+
+        for (int i = 0; i < length; i++)
             hash = (hash * RADIX + key.charAt(i)) % tableSize;
         return hash;
     }
@@ -34,28 +36,53 @@ public class Hashmap {
     public void add(String key, String value) {
         // Add value at its index (its hash) and check for collisions
 
-        int index = hash(key, key.length());
+        // Check to resize
+        int index = hash(key);
+
+        if (num_elements >= tableSize / 2) {
+            resize();
+        }
 
         while (keys[index] != null) {
-            if (index == tableSize / 2)
+            // Don't want to overflow
+            if (index >= tableSize / 2)
                 index = 0;
             else
                 index++;
         }
-
-        keys[index] = value;
+        keys[index] = key;
+        values[index] = value;
+        num_elements++;
     }
 
     // Returns the value stored at key in the hashmap
     public String get(String key) {
-
-
-        return "";
+        int index = hash(key);
+        while (keys[index] != null && !keys[index].equals(key)) {
+            if (index >= tableSize / 2)
+                index = 0;
+            else
+                index++;
+        }
+        return values[index];
     }
 
     // Double the hashmap when it is half-full
     public void resize() {
+        String[] oldKeys = keys;
+        String[] oldValues = values;
+        int oldTableSize = tableSize;
 
+        tableSize *= 2;
+
+        keys = new String[tableSize];
+        values = new String[tableSize];
+
+        num_elements = 0;
+
+        for (int i = 0; i < oldTableSize; i++) {
+            if (oldKeys[i] != null)
+                add(oldKeys[i], oldValues[i]);
+        }
     }
-
 }
